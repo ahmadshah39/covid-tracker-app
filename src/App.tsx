@@ -1,14 +1,14 @@
 import "./App.css";
-import { Heading,  Grid,  VStack,  Container, Box,} from "@chakra-ui/react";
+import { Heading, VStack,  Container, } from "@chakra-ui/react";
 // components
-import InfoCard from "./components/InfoCard";
 import TableSection from "./components/TableSection";
 
-import { FaGlobeAmericas, FaHeart, FaSkullCrossbones} from "react-icons/fa";
-import { RiSurgicalMaskFill} from "react-icons/ri";
 import Datachart from "./components/Datachart";
+import {GlobalProvider} from "./context/GlobalState";
+import Cards from "./components/Cards/Cards";
 function App() {
   return (
+    <GlobalProvider>
       <VStack minH="100vh"  bgColor="#121212">
           <Heading as="h1" my='4' display={['none', 'block']} textAlign='center' size='2xl' color="gray.400">
             GLOBAL COVID INFO 
@@ -17,22 +17,14 @@ function App() {
             GLOBAL COVID INFO 
           </Heading>
           <Container maxW="90%">
-            <Grid width='100%'  templateColumns={['repeat(1, 1fr)', 'repeat(1, 1fr)', 'repeat(2, 1fr)', 'null','repeat(4, 1fr)']} gap={5}>
-              <InfoCard colorText="#ff5252" iconColor='#ffffff' colorBorder='#424242' iconName={FaGlobeAmericas}/>
-              <InfoCard colorText="#ff5252" iconColor='#2196f3' colorBorder='#2196f3' iconName={RiSurgicalMaskFill}/>
-              <InfoCard colorText="#4caf50" iconColor='#4caf50' colorBorder='#4caf50' iconName={FaHeart}/>
-              <InfoCard colorText="#ff5252" iconColor='#ff5252' colorBorder='#ff5252' iconName={FaSkullCrossbones}/>
-            </Grid>
-       
-            <Grid width='100%' marginTop={5} templateColumns={['repeat(1, 1fr)', 'repeat(1, 1fr)', 'repeat(1, 1fr)' , 'repeat(2, 1fr)']} gap={5}>
+            <VStack justifyContent="space-between">
+              <Cards/>
               <Datachart/>
-              <Datachart/>
-            </Grid>
-            
-            <TableSection/>
+              <TableSection/>
+            </VStack>
           </Container>
-      
       </VStack>
+      </GlobalProvider>
     
   );
 }

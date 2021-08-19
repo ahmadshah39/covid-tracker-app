@@ -1,47 +1,58 @@
-import { Box, Heading } from "@chakra-ui/react";
-import {Line} from "react-chartjs-2";
+import { useEffect } from "react";
+import { Box } from "@chakra-ui/react";
+import { Line } from "react-chartjs-2";
+import { useGlobalContext } from "../context/GlobalState";
 const Datachart = () => {
-    return (
-        <Box  p={4} bgColor="#1e1e1e">
-            <Heading color='#ffffff'>
-                Linear
-            </Heading>
-        <Box position="relative" height="30vh" width="100%" >
-        <Line
-        data={{
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(54, 162, 235, 0.2)',
-                    'rgba(255, 206, 86, 0.2)',
-                    'rgba(75, 192, 192, 0.2)',
-                    'rgba(153, 102, 255, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-            }]
-        }}
-        width={600}
-        height={400}
-        options={{
-            maintainAspectRatio: false,
-            responsive:true,
-        }}
-            />
-            </Box>
-        </Box>
-    )
-}
+  const { globalHistory, getHistoricalGlobalData } = useGlobalContext();
+  useEffect(() => {
+    getHistoricalGlobalData();
+    // eslint-disable-next-line
+  }, []);
 
-export default Datachart
+  if (globalHistory === null) {
+    return <h4>loading....</h4>;
+  }
+  const { dates, cases, deaths, recovered } = globalHistory;
+
+  return (
+    <>
+      <Box width="100%" my={5} p={4} bgColor="#1e1e1e">
+        <Line
+          data={{
+            labels: dates,
+            datasets: [
+              {
+                data: cases,
+                label: "Infected",
+                borderColor: "#3333ff",
+                fill: true,
+              },
+              {
+                data: deaths,
+                label: "Deaths",
+                borderColor: "red",
+                backgroundColor: "rgba(255, 0, 0, 0.5)",
+                fill: true,
+              },
+              {
+                data: recovered,
+                label: "Recovered",
+                borderColor: "green",
+                backgroundColor: "rgba(0, 255, 0, 0.5)",
+                fill: true,
+              },
+            ],
+          }}
+          width={600}
+          height={400}
+          options={{
+            maintainAspectRatio: false,
+            responsive: true,
+          }}
+        />
+      </Box>
+    </>
+  );
+};
+
+export default Datachart;
