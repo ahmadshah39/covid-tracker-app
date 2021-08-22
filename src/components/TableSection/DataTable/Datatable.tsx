@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { Table, Thead, Tbody, Tr, Th, Box } from "@chakra-ui/react";
-import TableRows from "./TableRow";
+import { Table, Thead, Tbody, Tr, Th, Box, Spinner } from "@chakra-ui/react";
+import TableRow from "./TableRow";
 import Pagination from "./Pagination";
-import { CountryDataType } from "../../context/ActionTypes";
-import { useGlobalContext } from "../../context/GlobalState";
+import { useGlobalContext } from "../../../context/GlobalState";
 const Datatable = () => {
   const [countriesPerPage, setCountriesPerPage] = useState(10);
   const [currentPageNum, setCurrentPageNum] = useState(1);
@@ -15,6 +14,17 @@ const Datatable = () => {
     // eslint-disable-next-line
   }, []);
 
+  if (countriesData === null) {
+    return (
+      <Spinner
+        thickness="4px"
+        speed="0.65s"
+        emptyColor="gray.200"
+        color="blue.500"
+        size="xl"
+      />
+    );
+  }
   const data =
     countriesFiltered.length !== 0 ? countriesFiltered : countriesData;
 
@@ -39,6 +49,7 @@ const Datatable = () => {
       return;
     }
   };
+  console.log("DataTable");
 
   return (
     <Box
@@ -51,19 +62,37 @@ const Datatable = () => {
       <Table size="md" width="100%" textColor="#ffffff" overflowX="auto">
         <Thead>
           <Tr>
-            <Th borderBottomWidth="thin">Country</Th>
-            <Th textAlign="center">Cases</Th>
-            <Th textAlign="center">Cases Per Million</Th>
-            <Th textAlign="center">Critical</Th>
-            <Th textAlign="center">Recovered</Th>
-            <Th textAlign="center">Deaths</Th>
-            <Th textAlign="center">Deaths Per Million</Th>
-            <Th textAlign="center">Tests</Th>
-            <Th textAlign="center">Tests Per Million</Th>
+            <Th borderBottomColor={"#484a4c"}>Country</Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Cases
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Cases Per Million
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Critical
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Recovered
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Deaths
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Deaths Per Million
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Tests
+            </Th>
+            <Th borderBottomColor={"#484a4c"} textAlign="center">
+              Tests Per Million
+            </Th>
           </Tr>
         </Thead>
         <Tbody>
-          <TableRows countries={currentCountries} />
+          {currentCountries.map((country) => (
+            <TableRow key={country.country} country={country} />
+          ))}
         </Tbody>
       </Table>
       <Pagination

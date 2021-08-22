@@ -1,21 +1,33 @@
 import { createContext, useReducer, useContext } from "react";
+import {
+  fetchGlobalData,
+  fetchHistoricalGlobalData,
+  fetchCountriesData,
+  fetchCountryData,
+  fetchCountryHistoricalData,
+} from "../api/api";
 import GlobalReducer from "./GlobalReducer";
 import {
   CountryDataType,
   GET_GLOBAL_DATA,
   GET_COUNTRIES_DATA,
   GET_GLOBAL_HISTORY_DATA,
+  GET_COUNTRY_HISTORICAL_DATA,
+  GET_COUNTRY_DATA,
   SET_FILTER_VALUE,
   CLEAR_FILTER,
   GlobalHistoryType,
   GlobalType,
+  SET_LOADING,
 } from "./ActionTypes";
 // Types
 
 export type State = {
   global: GlobalType | null;
   globalHistory: GlobalHistoryType | null;
+  countryHistory: GlobalHistoryType | null;
   countriesData: CountryDataType[] | [];
+  countryData: GlobalType | null;
   countriesFiltered: CountryDataType[] | [];
   loading: boolean;
 };
@@ -23,19 +35,26 @@ export type State = {
 export interface IGlobalContextPorps {
   global: GlobalType | null;
   globalHistory: GlobalHistoryType | null;
+  countryHistory: GlobalHistoryType | null;
   countriesData: CountryDataType[] | [];
+  countryData: GlobalType | null;
   loading: boolean;
   countriesFiltered: CountryDataType[] | [];
+  setLoading: () => void;
   getGlobalData: () => void;
   getHistoricalGlobalData: () => void;
   getCountriesData: () => void;
   filterCountries: (value: string) => void;
+  getCountryData: (value: string) => void;
+  getCountryHistoricalData: (value: string) => void;
 }
 
 const initialState: State = {
   global: null,
   globalHistory: null,
+  countryHistory: null,
   countriesData: [],
+  countryData: null,
   loading: false,
   countriesFiltered: [],
 };
@@ -46,40 +65,49 @@ export const GlobalContext = createContext<IGlobalContextPorps>(
 
 export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(GlobalReducer, initialState);
-
-  const API_URL = "https://disease.sh/v3/covid-19";
   //   Actions
+
   //   getGlobalData
   const getGlobalData = async () => {
-    const url = `${API_URL}/all`;
-    const res = await (await fetch(url)).json();
-    console.log("reder/global");
-
     dispatch({
       type: GET_GLOBAL_DATA,
-      payload: res,
+      payload: await fetchGlobalData(),
     });
   };
   //   getHistoricalGlobalData
   const getHistoricalGlobalData = async () => {
-    const url = `${API_URL}/historical/all`;
-    const res = await (await fetch(url)).json();
-    const dates = Object.keys(res.cases);
-    const cases: number[] = Object.values(res.cases);
-    const deaths: number[] = Object.values(res.deaths);
-    const recovered: number[] = Object.values(res.recovered);
     dispatch({
       type: GET_GLOBAL_HISTORY_DATA,
-      payload: { dates, cases, deaths, recovered },
+      payload: await fetchHistoricalGlobalData(),
     });
   };
   //   getCountriesData
   const getCountriesData = async () => {
-    const url = `${API_URL}/countries`;
-    const res = await (await fetch(url)).json();
     dispatch({
       type: GET_COUNTRIES_DATA,
-      payload: res,
+      payload: await fetchCountriesData(),
+    });
+  };
+  // getCountryData
+  const getCountryData = async (value: string) => {
+    dispatch({
+      type: GET_COUNTRY_DATA,
+      payload: await fetchCountryData(value),
+    });
+  };
+  // getCountryHistoricalData
+  const getCountryHistoricalData = async (value: string) => {
+    const res = await fetchCountryHistoricalData(value);
+    if (!res.message) {
+      dispatch({
+        type: GET_COUNTRY_HISTORICAL_DATA,
+        payload: res,
+      });
+      return;
+    }
+    dispatch({
+      type: GET_COUNTRY_HISTORICAL_DATA,
+      payload: null,
     });
   };
 
@@ -92,10 +120,20 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
     }
     dispatch({ type: SET_FILTER_VALUE, payload: value });
   };
+  // SetLoading
+
+  const setLoading = () => dispatch({ type: SET_LOADING });
 
   // Destructuring state
-  const { global, loading, globalHistory, countriesData, countriesFiltered } =
-    state;
+  const {
+    global,
+    loading,
+    globalHistory,
+    countriesData,
+    countriesFiltered,
+    countryData,
+    countryHistory,
+  } = state;
   // return Provider
   return (
     <GlobalContext.Provider
@@ -105,10 +143,15 @@ export const GlobalProvider = ({ children }: { children: React.ReactNode }) => {
         globalHistory,
         countriesData,
         countriesFiltered,
+        countryData,
+        countryHistory,
+        setLoading,
         getGlobalData,
         getHistoricalGlobalData,
         getCountriesData,
         filterCountries,
+        getCountryHistoricalData,
+        getCountryData,
       }}
     >
       {children}

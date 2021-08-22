@@ -1,22 +1,26 @@
-import { useEffect } from "react";
+import React from "react";
 import InfoCard from "./InfoCard/InfoCard";
-import { Grid, Text, HStack } from "@chakra-ui/react";
+import { Grid, Text, HStack, Box } from "@chakra-ui/react";
 import { FaGlobeAmericas, FaHeart, FaSkullCrossbones } from "react-icons/fa";
 import { RiSurgicalMaskFill } from "react-icons/ri";
-import { useGlobalContext } from "../../context/GlobalState";
-const Cards = () => {
-  const { global, getGlobalData } = useGlobalContext();
-  useEffect(() => {
-    getGlobalData();
-    // eslint-disable-next-line
-  }, []);
-
-  if (global === null) {
-    return <h4>loading...</h4>;
+import { GlobalType } from "../../context/ActionTypes";
+const Cards = React.memo(({ data }: { data: GlobalType | null }) => {
+  if (data === null) {
+    return (
+      <Box width="100%" my={5} p={4} bgColor="#1e1e1e">
+        <Text
+          fontSize={["lg", "xl", "4xl"]}
+          textAlign="center"
+          color="gray.400"
+        >
+          No historical Data Found....
+        </Text>
+      </Box>
+    );
   }
 
   const {
-    updated,
+    country,
     cases,
     todayCases,
     deaths,
@@ -29,9 +33,8 @@ const Cards = () => {
     population,
     activePerOneMillion,
     recoveredPerOneMillion,
-    affectedCountries,
-  } = global;
-  const data = [
+  } = data;
+  const dataArray = [
     {
       title: "Total Cases",
       total: cases,
@@ -76,10 +79,10 @@ const Cards = () => {
   return (
     <>
       <HStack py={1} width="100%" justifyContent="space-between">
-        <Text fontSize="4xl" color="gray.200">
-          World Population
+        <Text fontSize={["lg", "xl", "4xl"]} color="gray.200">
+          {country ? `${country} Population` : " World Population"}
         </Text>
-        <Text fontSize="4xl" color="gray.200">
+        <Text fontSize={["lg", "xl", "4xl"]} color="gray.200">
           {population}
         </Text>
       </HStack>
@@ -94,12 +97,12 @@ const Cards = () => {
         ]}
         gap={5}
       >
-        {data.map((item) => (
+        {dataArray.map((item) => (
           <InfoCard key={item.title} data={item} />
         ))}
       </Grid>
     </>
   );
-};
+});
 
 export default Cards;

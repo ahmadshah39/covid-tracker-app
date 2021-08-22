@@ -1,31 +1,31 @@
 import "./App.css";
-import { Heading, VStack,  Container, } from "@chakra-ui/react";
-// components
-import TableSection from "./components/TableSection";
+import { Heading, VStack, Container } from "@chakra-ui/react";
 
-import Datachart from "./components/Datachart";
-import {GlobalProvider} from "./context/GlobalState";
-import Cards from "./components/Cards/Cards";
+import { GlobalProvider } from "./context/GlobalState";
+import Home from "./Pages/Home";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import Country from "./Pages/Country";
+import Footer from "./components/Footer/Footer";
+
 function App() {
   return (
     <GlobalProvider>
-      <VStack minH="100vh"  bgColor="#121212">
-          <Heading as="h1" my='4' display={['none', 'block']} textAlign='center' size='2xl' color="gray.400">
-            GLOBAL COVID INFO 
-          </Heading>
-          <Heading as="h1" my='4' display={['block', 'none']} textAlign='center' size='lg' color="gray.400">
-            GLOBAL COVID INFO 
-          </Heading>
-          <Container maxW="90%">
-            <VStack justifyContent="space-between">
-              <Cards/>
-              <Datachart/>
-              <TableSection/>
-            </VStack>
-          </Container>
+      <VStack minH="100vh" py={5} bgColor="#121212">
+        <Heading as="h1" my="4" textAlign="center" size="xl" color="gray.400">
+          GLOBAL COVID INFO
+        </Heading>
+
+        <Container maxW="90%">
+          <Router>
+            <Switch>
+              <Route exact path="/" children={<Home />} />
+              <Route exact path="/country/:id" children={<Country />} />
+            </Switch>
+          </Router>
+          <Footer />
+        </Container>
       </VStack>
-      </GlobalProvider>
-    
+    </GlobalProvider>
   );
 }
 

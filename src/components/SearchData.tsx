@@ -1,3 +1,4 @@
+// import { useState, useEffect, useRef } from "react";
 import {
   Grid,
   Heading,
@@ -7,16 +8,14 @@ import {
 } from "@chakra-ui/react";
 import { FaSearch } from "react-icons/fa";
 import { useGlobalContext } from "../context/GlobalState";
+
 const SearchData = () => {
   const { filterCountries } = useGlobalContext();
   const onChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    e.preventDefault();
-    if (e.target.value !== "") {
-      filterCountries(e.target.value);
-    } else {
-      filterCountries("");
-    }
+    filterCountries(e.target.value);
   };
+
+  console.log("searchData");
   return (
     <Grid
       width="100%"
